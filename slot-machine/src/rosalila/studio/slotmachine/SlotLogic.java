@@ -17,11 +17,13 @@ public class SlotLogic {
 	
 	Label label_credits;
 	Label label_total_bet;
+	Label label_last_prize;
 	double last_prize;
+	boolean is_rolling=false;
 	
 	private final AndroidFunctionsInterface androidFunctions;
 	
-	public SlotLogic(ArrayList< ArrayList<Box> > boxes, float credits, Image win, Lines lines, Bet bet, Label label_credits, Label label_total_bet,ArrayList<Powerup> powerups,AndroidFunctionsInterface androidFunctions_param)
+	public SlotLogic(ArrayList< ArrayList<Box> > boxes, float credits, Image win, Lines lines, Bet bet, Label label_credits, Label label_total_bet, Label label_last_prize, ArrayList<Powerup> powerups,AndroidFunctionsInterface androidFunctions_param)
 	{
 		this.boxes = boxes;
 		this.credits = credits;
@@ -31,6 +33,7 @@ public class SlotLogic {
 		this.bet=bet;
 		this.label_credits=label_credits;
 		this.label_total_bet=label_total_bet;
+		this.label_last_prize=label_last_prize;
 		this.powerups=powerups;
 		this.androidFunctions=androidFunctions_param;
 		last_prize=0;
@@ -38,6 +41,9 @@ public class SlotLogic {
 	
 	void beginRoll()
 	{
+		is_rolling=true;
+		
+		lines.hideLinesUI();
 		for(int i=0;i<powerups.size();i++)
 		{
 			powerups.get(i).value--;
@@ -113,11 +119,14 @@ public class SlotLogic {
 		{
 			win.setVisible(true);
 			credits+=prize;
+			last_prize=prize;
 		}
 		
-		last_prize=prize;
+		label_last_prize.setText(getLastPrizeString());
 		label_credits.setText(getCreditsString());
 		androidFunctions.SubmitScore(credits);
+		
+		is_rolling=false;
 	}
 	
 	double winCombo6(int row)
@@ -262,21 +271,26 @@ public class SlotLogic {
 	
 	String getCreditsString()
 	{
-		return "Credits: "+credits;
+		return "Credits:\n"+credits;
 	}
 	
 	String getTotalBetString()
 	{
-		return "Total bet: "+getTotalBet();
+		return "Total bet:\n"+getTotalBet();
 	}
 	
 	String getLastPrizeString()
 	{
-		return "Last prize: "+last_prize;
+		return "Last prize:\n"+last_prize;
 	}
 	
 	double getTotalBet()
 	{
 		return lines.getValue()*bet.getValue();
+	}
+	
+	boolean canRoll()
+	{
+		return getTotalBet()<=credits && !is_rolling;
 	}
 }

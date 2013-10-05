@@ -10,4 +10,6 @@ public interface AndroidFunctionsInterface {
 	public void SwarmYourGameCloudDataLoad();
 	public String SwarmYourGameCloudDataGet();
 	public float getScore();
+	public float getReadedBarcode();
+	public void readBarCode();
 }

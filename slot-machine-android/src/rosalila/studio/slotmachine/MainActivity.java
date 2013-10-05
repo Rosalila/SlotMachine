@@ -2,10 +2,14 @@ package rosalila.studio.slotmachine;
 
 import java.util.Map;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
 import com.swarmconnect.Swarm;
 import com.swarmconnect.SwarmAchievement;
 import com.swarmconnect.SwarmAchievement.GotAchievementsMapCB;
@@ -19,7 +23,8 @@ import com.swarmconnect.delegates.SwarmLoginListener;
 
 public class MainActivity extends AndroidApplication implements
 		AndroidFunctionsInterface {
-	int loaded_score = -1;
+	int loaded_score = 0;
+	float readed_barcode;
 	boolean loaded_score_ready = false;
 
 	int LEADERBOARD_ID = 10730;
@@ -48,9 +53,12 @@ public class MainActivity extends AndroidApplication implements
 		// Swarm.showDashboard();
 
 		final SlotMachine slot_machine = new SlotMachine(this);
+		
+		readed_barcode=-1;
 
 		initialize(slot_machine, cfg);
-
+		
+		//readBarCode();
 	}
 	
 	@Override
@@ -258,5 +266,41 @@ public class MainActivity extends AndroidApplication implements
 
 	public float getScore() {
 		return loaded_score;
+	}
+	
+	public float getReadedBarcode() {
+		return readed_barcode;
+	}
+	
+	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
+		//retrieve result of scanning - instantiate ZXing object
+		IntentResult scanningResult = IntentIntegrator.parseActivityResult(requestCode, resultCode, intent);
+		//check we have a valid result
+		if (scanningResult != null) {
+			//get content from Intent Result
+			String scanContent = scanningResult.getContents();
+			//get format name of data scanned
+			String scanFormat = scanningResult.getFormatName();
+			//output to UI
+//			formatTxt.setText("FORMAT: "+scanFormat);
+//			contentTxt.setText("CONTENT: "+scanContent);
+			
+			readed_barcode=Integer.parseInt(scanContent);
+			
+		}
+		else{
+			//invalid scan data or scan canceled
+			Toast toast = Toast.makeText(getApplicationContext(), 
+					"No scan data received!", Toast.LENGTH_SHORT);
+			toast.show();
+		}
+	}
+	
+	public void readBarCode()
+	{
+		readed_barcode=-1;
+		IntentIntegrator scanIntegrator = new IntentIntegrator(this);
+		//start scanning
+		scanIntegrator.initiateScan();
 	}
 }

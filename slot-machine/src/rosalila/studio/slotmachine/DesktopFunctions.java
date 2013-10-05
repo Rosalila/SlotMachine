@@ -51,4 +51,15 @@ public class DesktopFunctions implements AndroidFunctionsInterface
 		Gdx.app.log("DesktopFunctions", "Swarm YourGame Get Score");
 		return 1;
 	}
+	
+	public float getReadedBarcode()
+	{
+		Gdx.app.log("DesktopFunctions", "Requesting readed barcode");
+		return 1;
+	}
+	
+	public void readBarCode()
+	{
+		Gdx.app.log("DesktopFunctions", "Reading BarCode");
+	}
 }
